@@ -1,7 +1,8 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using Unity.Mathematics;
 using UnityEngine;
 using VTools.Grid;
 using VTools.ScriptableObjectDatabase;
@@ -9,125 +10,53 @@ using VTools.Utility;
 
 namespace Components.ProceduralGeneration.SimpleRoomPlacement
 {
-    [CreateAssetMenu(menuName = "Procedural Generation Method/Cellular Automata")]
-    public class CellularAutomata : ProceduralGenerationMethod
+    [CreateAssetMenu(menuName = "Procedural Generation Method/FastNoise")]
+    public class FastNoise : ProceduralGenerationMethod
     {
-        [SerializeField] private float _noiseDensity = 0.5f;
-        private Dictionary<Vector2Int, string> tmpGrid = new();
+        [SerializeField] private FastNoiseLite noise = new();
+        [SerializeField] private FastNoiseLite.NoiseType noiseType;
+        [Range(0.1f, 1f)]
+        [SerializeField] private float frequency;
+
 
         protected override async UniTask ApplyGeneration(CancellationToken cancellationToken)
         {
-            CreateNoiseGrid();
+            BuildMap();
             for (int i = 0; i < _maxSteps; i++)
             {
 
-                Arrange();
-                Replace();
-                tmpGrid.Clear();
+
                 await UniTask.Delay(200);
             }
         }
 
-        public void CreateNoiseGrid()
+        public void BuildMap()
         {
             for (int x = 0; x < Grid.Width; x++)
             {
-                for (int y = 0; y < Grid.Lenght; y++)
+                for (int z = 0; z < Grid.Lenght; z++)
                 {
-                    if (!Grid.TryGetCellByCoordinates(x, y, out var cell))
+                    if (!Grid.TryGetCellByCoordinates(x, z, out var chosenCell))
+                    {
                         continue;
-                    bool isWater = RandomService.Chance(0.5f);
-                    if (isWater)
-                    {
-                        AddTileToCell(cell, WATER_TILE_NAME, true);
                     }
-                    else
+                    float NoiseAtCoords = noise.GetNoise(x, z);
+                    if (NoiseAtCoords >= 0.5f)
                     {
-                        AddTileToCell(cell, GRASS_TILE_NAME, true);
+                        AddTileToCell(chosenCell, ROCK_TILE_NAME, false);
                     }
-                }
-            }
-        }
-        public void Arrange()
-        {
-            for (int x = 0; x < Grid.Width; x++)
-            {
-                for (int y = 0; y < Grid.Lenght; y++)
-                {
-                    if (!Grid.TryGetCellByCoordinates(x, y, out var cell))
-                        continue;
-                    int voidCell = 0;
-                    int grassCell = 0;
-                    for (int up = -1; up <= 1; up++)
+                    else if (NoiseAtCoords >= 0f)
                     {
-                        for (int down = -1; down <= 1; down++)
-                        {
-                            if(!(up == 0 && down == 0))
-                            {
-                                if (!Grid.TryGetCellByCoordinates(x + up, y + down, out var nextCell))
-                                {
-
-                                    voidCell++;
-                                }
-                                else
-                                {
-
-
-                                    if (nextCell.GridObject.Template.Name == GRASS_TILE_NAME)
-                                    {
-                                        grassCell++;
-                                    }
-                                }
-                            }
-                        }
+                        AddTileToCell(chosenCell, GRASS_TILE_NAME, false);
                     }
-                    if (voidCell == 0) // normal
+                    else if (NoiseAtCoords >= -0.5f)
                     {
-                        if (grassCell >= 4)
-                        {
-                            tmpGrid.Add(new Vector2Int(x, y), GRASS_TILE_NAME);
-                        }
-                        else
-                        {
-                            tmpGrid.Add(new Vector2Int(x, y), WATER_TILE_NAME);
-                        }
+                        AddTileToCell(chosenCell, SAND_TILE_NAME, false);
                     }
-                    else if (voidCell == 3) // border
+                    else if (NoiseAtCoords >= -1f)
                     {
-                        if (grassCell >= 3)
-                        {
-                            tmpGrid.Add(new Vector2Int(x, y), GRASS_TILE_NAME);
-                        }
-                        else
-                        {
-                            tmpGrid.Add(new Vector2Int(x, y), WATER_TILE_NAME);
-                        }
+                        AddTileToCell(chosenCell, WATER_TILE_NAME, false);
                     }
-                    else // corner
-                    {
-                        if (grassCell >= 2)
-                        {
-                            tmpGrid.Add(new Vector2Int(x, y), GRASS_TILE_NAME);
-                        }
-                        else
-                        {
-                            tmpGrid.Add(new Vector2Int(x, y), WATER_TILE_NAME);
-                        }
-                    }
-                }
-            }
-        }
-        private void Replace()
-        {
-            for (int x = 0; x < Grid.Width; x++)
-            {
-                for (int y = 0; y < Grid.Lenght; y++)
-                {
-                    if (!Grid.TryGetCellByCoordinates(x, y, out var cell))
-                        continue;
-
-                    string tile = tmpGrid[new Vector2Int(x, y)];
-                    AddTileToCell(cell, tile, true);
                 }
             }
         }
