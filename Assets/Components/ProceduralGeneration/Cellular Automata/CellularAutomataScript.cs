@@ -30,9 +30,9 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
 
         public void CreateNoiseGrid()
         {
-            for (int x = 0; x < 64; x++)
+            for (int x = 0; x < Grid.Width; x++)
             {
-                for (int y = 0; y < 64; y++)
+                for (int y = 0; y < Grid.Lenght; y++)
                 {
                     if (!Grid.TryGetCellByCoordinates(x, y, out var cell))
                         continue;
@@ -50,9 +50,9 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
         }
         public void Arrange()
         {
-            for (int x = 0; x < 64; x++)
+            for (int x = 0; x < Grid.Width; x++)
             {
-                for (int y = 0; y < 64; y++)
+                for (int y = 0; y < Grid.Lenght; y++)
                 {
                     if (!Grid.TryGetCellByCoordinates(x, y, out var cell))
                         continue;
@@ -62,23 +62,25 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
                     {
                         for (int down = -1; down <= 1; down++)
                         {
-                            if (!Grid.TryGetCellByCoordinates(x + up, y + down, out var nextCell))
+                            if(!(up == 0 && down == 0))
                             {
-
-                                voidCell++;
-                            }
-                            else
-                            {
-
-
-                                if (nextCell.GridObject.Template.Name == GRASS_TILE_NAME)
+                                if (!Grid.TryGetCellByCoordinates(x + up, y + down, out var nextCell))
                                 {
-                                    grassCell++;
+
+                                    voidCell++;
+                                }
+                                else
+                                {
+
+
+                                    if (nextCell.GridObject.Template.Name == GRASS_TILE_NAME)
+                                    {
+                                        grassCell++;
+                                    }
                                 }
                             }
                         }
                     }
-                    Debug.Log(voidCell);
                     if (voidCell == 0) // normal
                     {
                         if (grassCell >= 4)
@@ -117,9 +119,9 @@ namespace Components.ProceduralGeneration.SimpleRoomPlacement
         }
         private void Replace()
         {
-            for (int x = 0; x < 64; x++)
+            for (int x = 0; x < Grid.Width; x++)
             {
-                for (int y = 0; y < 64; y++)
+                for (int y = 0; y < Grid.Lenght; y++)
                 {
                     if (!Grid.TryGetCellByCoordinates(x, y, out var cell))
                         continue;
