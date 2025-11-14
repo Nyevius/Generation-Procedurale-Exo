@@ -60,7 +60,7 @@ Ensuite, il va créer des couloirs pour relier les salles à leur parent.
 ## Cellular Automata
 Pour ce script, on abandonne le placement de salles. Cet algo sert à générer du terrain. On commence par du bruit, c'est-à-dire placer de façon aléatoire des tiles d'eau ou de terre. Ensuite on répère certaines conditions, si on les respecte (ici, plus de 4 cellules terre autour de celle qu'on regarde). Si la condition est respectée on passe la cellule qu'on regarde en terre, sinon on la passe en eau. On fait cette boucle pour chaque case de notre map.    
 
-<img src="Documentation/Cellularautomata.png?raw=true"/>  
+<img src="Documentation/CellularAutomata.png?raw=true"/>  
 
 ## Noise Generator  
 Un autre algorithme de génération de terrain, mais plus précis cette fois. On passera par la librairie FastNoiseLite afin de générer une map de bruit. On le créé, lui assigne plusieurs paramètres et la librairie fait le reste il ne nous reste qu'à instancier nos tiles en fonction du résultat.  
