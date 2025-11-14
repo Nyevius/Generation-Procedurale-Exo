@@ -3,13 +3,13 @@
 <details>
 <summary>Details</summary>
 
-  - [Introduction](#Introduction)
-  - [Getting Started](#GettingStarted)
-  - [Simple Room Placement](#SimpleRoomPlacement)
-  - [Binary Space Partitioning](#BSP)
-  - [Cellular Automata](#CellularAutomata)
-  - [Noise Generator](#NoiseGenerator)
-  - [Credits](#Credits)
+  - [Introduction](#introduction)
+  - [Getting Started](#getting-started)
+  - [Simple Room Placement](#simple-room-placement)
+  - [Binary Space Partitioning](#bsp)
+  - [Cellular Automata](#cellular-automata)
+  - [Noise Generator](#noise-generator)
+  - [Credits](#credits)
 
 </details>
 
